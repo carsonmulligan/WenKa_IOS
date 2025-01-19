@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<improvements>
+    <feature>
+        <name>Deepseek API Integration</name>
+        <description>Allow users to create new flashcards using Deepseek API</description>
+        <implementation>
+            <step>
+                <title>Create DeepseekService</title>
+                <file>DeepseekService.swift</file>
+                <code>
+                    class DeepseekService {
+                        func createFlashcard(text: String) async throws -> FlashCard {
+                            // API configuration and call
+                            // Returns JSON formatted flashcard data
+                        }
+                    }
+                </code>
+                <notes>
+                    - Use response_format={'type': 'json_object'}
+                    - Include system prompt for formatting Chinese text, pinyin, and English translation
+                    - Handle API key securely in configuration
+                </notes>
+            </step>
+            <step>
+                <title>Add CreateFlashcardView</title>
+                <file>CreateFlashcardView.swift</file>
+                <code>
+                    struct CreateFlashcardView {
+                        // Text input field
+                        // Topic selection
+                        // API integration
+                        // Preview of generated flashcard
+                    }
+                </code>
+            </step>
+        </implementation>
+    </feature>
+
+    <feature>
+        <name>Pinyin Toggle Display</name>
+        <description>Show/hide pinyin above Chinese characters</description>
+        <implementation>
+            <step>
+                <title>Update FlashCardView</title>
+                <file>FlashCardView.swift</file>
+                <changes>
+                    <add>
+                        @State private var showPinyin = true
+                        
+                        // Add toggle button in navigation bar
+                        .toolbar {
+                            ToolbarItem {
+                                Button(action: { showPinyin.toggle() }) {
+                                    Image(systemName: "text.phonetic")
+                                }
+                            }
+                        }
+                    </add>
+                    <modify>
+                        // Update text display to stack pinyin conditionally
+                        VStack(spacing: 4) {
+                            if showPinyin {
+                                Text(card.pinyin)
+                                    .font(.caption)
+                            }
+                            Text(card.front)
+                        }
+                    </modify>
+                </changes>
+            </step>
+        </implementation>
+    </feature>
+
+    <feature>
+        <name>Vertical Chinese Text</name>
+        <description>Display Chinese characters vertically in traditional style</description>
+        <implementation>
+            <step>
+                <title>Create VerticalTextView</title>
+                <file>VerticalTextView.swift</file>
+                <code>
+                    struct VerticalTextView: View {
+                        let text: String
+                        
+                        var body: some View {
+                            VStack(spacing: 8) {
+                                ForEach(Array(text), id: \.self) { character in
+                                    Text(String(character))
+                                }
+                            }
+                        }
+                    }
+                </code>
+            </step>
+            <step>
+                <title>Update FlashCardView</title>
+                <file>FlashCardView.swift</file>
+                <changes>
+                    <add>
+                        @State private var isVerticalMode = false
+                        
+                        // Add mode toggle in toolbar
+                        ToolbarItem {
+                            Button(action: { isVerticalMode.toggle() }) {
+                                Image(systemName: isVerticalMode ? "text.justify" : "text.justify.left")
+                            }
+                        }
+                    </add>
+                    <modify>
+                        // Conditional rendering based on mode
+                        Group {
+                            if isVerticalMode {
+                                VerticalTextView(text: card.front)
+                            } else {
+                                Text(card.front)
+                            }
+                        }
+                    </modify>
+                </changes>
+            </step>
+        </implementation>
+    </feature>
+
+    <dependencies>
+        <dependency>
+            <name>Deepseek API Key</name>
+            <type>Environment Variable</type>
+            <configuration>
+                Add to Info.plist or use secure storage
+            </configuration>
+        </dependency>
+    </dependencies>
+
+    <userInterface>
+        <updates>
+            <toolbar>
+                - Add pinyin toggle button
+                - Add vertical mode toggle button
+                - Add create new flashcard button
+            </toolbar>
+            <navigation>
+                Add CreateFlashcardView to navigation stack
+            </navigation>
+        </updates>
+    </userInterface>
+</improvements> 
