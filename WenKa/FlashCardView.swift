@@ -3,7 +3,6 @@ import SwiftUI
 struct FlashCardView: View {
     @StateObject private var viewModel = FlashCardViewModel()
     @State private var cardRotation = 0.0
-    @State private var contentRotation = 0.0
     
     var body: some View {
         VStack {
@@ -23,12 +22,9 @@ struct FlashCardView: View {
                 
                 // Card
                 ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(.systemBackground))
-                        .shadow(radius: 10)
-                    
-                    VStack(spacing: 20) {
-                        if !viewModel.isShowingAnswer {
+                    // Front of card
+                    CardFace(content: {
+                        VStack(spacing: 20) {
                             Text(card.front)
                                 .font(.title)
                                 .multilineTextAlignment(.center)
@@ -36,13 +32,18 @@ struct FlashCardView: View {
                             Text(card.pinyin)
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
-                        } else {
-                            Text(card.back)
-                                .font(.title)
-                                .multilineTextAlignment(.center)
                         }
-                    }
-                    .padding(30)
+                    })
+                    .opacity(viewModel.isShowingAnswer ? 0 : 1)
+                    
+                    // Back of card
+                    CardFace(content: {
+                        Text(card.back)
+                            .font(.title)
+                            .multilineTextAlignment(.center)
+                    })
+                    .opacity(viewModel.isShowingAnswer ? 1 : 0)
+                    .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
                 }
                 .frame(height: 300)
                 .rotation3DEffect(.degrees(cardRotation), axis: (x: 0, y: 1, z: 0))
@@ -106,5 +107,20 @@ struct FlashCardView: View {
             }
         }
         .padding()
+    }
+}
+
+struct CardFace<Content: View>: View {
+    let content: () -> Content
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(.systemBackground))
+                .shadow(radius: 10)
+            
+            content()
+                .padding(30)
+        }
     }
 } 
